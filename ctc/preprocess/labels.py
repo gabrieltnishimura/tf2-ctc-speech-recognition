@@ -1,9 +1,8 @@
 import numpy as np
 import tensorflow as tf
-from utils.text_utils import text_to_int_sequence
 
 
-def switch(character):
+def tf_char_to_int(character):
     return tf.case([
         (tf.equal(character, tf.constant(' ')), lambda: tf.constant(0)),
         (tf.equal(character, tf.constant('a')), lambda: tf.constant(1)),
@@ -36,11 +35,10 @@ def switch(character):
     ], exclusive=True)
 
 
-def test(label):
+def convert_to_int_array(label):
     splitted = tf.strings.bytes_split(label)
-    mapped = tf.map_fn(switch, splitted, dtype=(tf.int32))
-    tf.print(mapped)
-    return mapped
+    int_array = tf.map_fn(tf_char_to_int, splitted, dtype=(tf.int32))
+    return int_array
 
 
 def process(labels):
@@ -54,18 +52,14 @@ def process(labels):
     len_y_seq = []
     y = []
 
-    tf.print(labels)
-    y.append(tf.map_fn(test, labels, dtype=(tf.int32)))
-    tf.print(y)
-
-    # for i in range(0, len(labels)):
-    #     y_int = text_to_int_sequence(labels[i])
-    #     len_y_seq.append(len(y_int))
-    #     y.append(y_int)
+    for label in labels:
+        y_raw = convert_to_int_array(label)
+        len_y_seq.append(len(y_raw))
+        y.append(y_raw)
 
     y = tf.keras.preprocessing.sequence.pad_sequences(
         y, dtype='float', padding='post', truncating='post')
 
-    label_length = np.array(len_y_seq)
+    len_y_seq = np.array(len_y_seq)
 
-    return y, label_length
+    return y, len_y_seq

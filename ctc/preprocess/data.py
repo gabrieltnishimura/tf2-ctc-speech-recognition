@@ -4,11 +4,11 @@ from preprocess.labels import process as process_labels
 
 
 def tf_function_wrapper(features, labels):
-    features = tf.py_function(func=process_features, inp=[
-                              features['filename']], Tout=tf.float32)
-    labels = tf.py_function(func=process_labels, inp=[
-                            labels], Tout=(tf.int32, tf.int32))
-    tf.print(labels)
+    features, feature_lengths = tf.py_function(func=process_features, inp=[
+        features['filename']],
+        Tout=(tf.float32, tf.int32))
+    labels, label_lengths = tf.py_function(func=process_labels, inp=[
+        labels], Tout=(tf.int32, tf.int32))
     return features, labels
 
 

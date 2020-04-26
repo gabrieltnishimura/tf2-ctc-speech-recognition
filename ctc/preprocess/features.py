@@ -54,10 +54,13 @@ def wav_to_mfcc(path):
 
 def process(wav_files):
     features = []
+    features_length = []
     for file in wav_files:
-        features.append(wav_to_mfcc(file))
+        mfccs = wav_to_mfcc(file)
+        features.append(mfccs)
+        features_length.append(len(mfccs))
 
     # pad different sized mfccs
     features = tf.keras.preprocessing.sequence.pad_sequences(
         features, dtype='float', padding='post', truncating='post')
-    return features
+    return features, features_length
