@@ -27,5 +27,6 @@ def load_dataset(csv_filename):
         csv_filename, batch_size=4,
         shuffle=False, label_name="transcript")
 
-    librivox_ds = librivox_paths_ds.map(tf_function_wrapper)
+    librivox_ds = librivox_paths_ds.map(
+        tf_function_wrapper, num_parallel_calls=1)
     return librivox_ds
