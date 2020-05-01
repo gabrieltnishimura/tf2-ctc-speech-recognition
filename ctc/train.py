@@ -4,9 +4,16 @@ from models import brnn
 from training.LossCallback import LossCallback
 from datetime import datetime
 
+from tensorflow.keras.layers import Input, Lambda
+from tensorflow.keras import Model
+
 training_ds = load_dataset("librivox-train-clean-100-wav.csv")
 validation_ds = load_dataset("librivox-dev-clean-wav.csv")
 test_ds = load_dataset("librivox-test-clean-wav.csv")
+
+for features, labels in training_ds.take(1):
+    tf.print(tf.shape(features['the_input'][0]))
+    tf.print(features['the_input'][0])
 
 print("\n\nModel and training parameters: ")
 print("Starting time: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -29,11 +36,11 @@ loss_cb = LossCallback(
 )
 
 brnn.fit(
-    x=training_ds,
-    # validation_data=validation_ds,
-    # epochs=10,
-    # verbose=2,
-    # workers=1,
-    # shuffle=False,
-    # callbacks=[loss_cb]
+    training_ds,
+    validation_data=validation_ds,
+    epochs=10,
+    verbose=2,
+    workers=1,
+    shuffle=False,
+    callbacks=[loss_cb]
 )

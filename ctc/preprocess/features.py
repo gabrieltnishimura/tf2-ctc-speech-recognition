@@ -23,7 +23,7 @@ def convert_to_spectrogram(stfts):
 
 def convert_log_mel_spectrograms(spectrograms, sample_rate,
                                  num_spectrogram_bins, lower_edge_hertz=80.0,
-                                 upper_edge_hertz=7600.0, num_mel_bins=80):
+                                 upper_edge_hertz=7600.0, num_mel_bins=26):
 
     linear_to_mel_weight_matrix = tf.signal.linear_to_mel_weight_matrix(
         num_mel_bins, num_spectrogram_bins, sample_rate, lower_edge_hertz,
