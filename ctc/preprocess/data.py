@@ -22,11 +22,17 @@ def tf_function_wrapper(features, labels):
     return inputs, outputs
 
 
+def remove_big_sentences(x, y):
+    comparison = tf.math.less(tf.strings.length(y), tf.constant(280))
+    return tf.math.count_nonzero(comparison) == len(y)
+
+
 def load_dataset(csv_filename):
     librivox_paths_ds = tf.data.experimental.make_csv_dataset(
-        csv_filename, batch_size=4,
+        csv_filename, batch_size=16,
         shuffle=False, label_name="transcript")
 
+    librivox_paths_ds = librivox_paths_ds.filter(remove_big_sentences)
     librivox_ds = librivox_paths_ds.map(
         tf_function_wrapper, num_parallel_calls=1)
     return librivox_ds

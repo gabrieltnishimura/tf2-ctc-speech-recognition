@@ -6,7 +6,11 @@ from tensorflow.keras.models import Model
 # Architecture from Baidu Deep speech: Scaling up end-to-end speech recognition (https://arxiv.org/pdf/1412.5567.pdf)
 
 
-def brnn_model(units, input_dim=26, output_dim=29, dropout=0.2, numb_of_dense=3,
+def brnn_model(units,
+               input_dim=26,
+               output_dim=29,
+               dropout=0.2,
+               numb_of_dense=3,
                n_layers=1):
     """
     :param units: Hidden units per layer
