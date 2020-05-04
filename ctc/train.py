@@ -44,8 +44,6 @@ brnn.fit(
     validation_data=validation_ds.as_numpy_iterator(),
     epochs=10,
     verbose=2,
-    workers=1,
     shuffle=False,
-    # callbacks=[loss_cb],
-    use_multiprocessing=False,
+    callbacks=[loss_cb],
 )
