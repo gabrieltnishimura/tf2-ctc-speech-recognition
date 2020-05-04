@@ -4,25 +4,19 @@ from models import brnn
 from training.LossCallback import LossCallback
 from datetime import datetime
 
-# tf.keras.backend.clear_session()
-import logging
-logger = tf.get_logger()
-logger.setLevel(logging.DEBUG)
-
 training_ds = load_dataset("librivox-train-clean-100-wav.csv")
 validation_ds = load_dataset("librivox-dev-clean-wav.csv")
 test_ds = load_dataset("librivox-test-clean-wav.csv")
 
-
-for features, labels in training_ds.take(1):
-    tf.print(tf.rank(features['the_input']))
-    tf.print(tf.rank(features['the_labels']))
-    tf.print(tf.rank(features['input_length']))
-    tf.print(tf.rank(features['label_length']))
-    tf.print(features['the_input'].get_shape())
-    tf.print(features['the_labels'].get_shape())
-    tf.print(features['input_length'].get_shape())
-    tf.print(features['label_length'].get_shape())
+# for features, labels in training_ds.take(1):
+#     tf.print(tf.rank(features['the_input']))
+#     tf.print(tf.rank(features['the_labels']))
+#     tf.print(tf.rank(features['input_length']))
+#     tf.print(tf.rank(features['label_length']))
+#     tf.print(features['the_input'].get_shape())
+#     tf.print(features['the_labels'].get_shape())
+#     tf.print(features['input_length'].get_shape())
+#     tf.print(features['label_length'].get_shape())
 
 print("\n\nModel and training parameters: ")
 print("Starting time: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -37,8 +31,8 @@ test_func = tf.keras.backend.function([input_data], [y_pred])
 # The loss callback function that calculates WER while training
 loss_cb = LossCallback(
     test_func=test_func,
-    validation_gen=validation_ds,
-    test_gen=test_ds,
+    validation_gen=validation_ds.as_numpy_iterator(),
+    test_gen=test_ds.as_numpy_iterator(),
     model=brnn,
     checkpoint=10,
     path_to_save='./',
@@ -46,8 +40,8 @@ loss_cb = LossCallback(
 )
 
 brnn.fit(
-    x=training_ds,
-    # validation_data=validation_ds,
+    x=training_ds.as_numpy_iterator(),
+    validation_data=validation_ds.as_numpy_iterator(),
     epochs=10,
     verbose=2,
     workers=1,
