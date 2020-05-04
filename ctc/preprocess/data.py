@@ -3,6 +3,8 @@ import numpy as np
 from preprocess.features import process as process_features
 from preprocess.labels import process as process_labels
 
+batch_size = 4
+
 
 def tf_function_wrapper(features, labels):
     features, feature_length = tf.py_function(func=process_features, inp=[
@@ -17,7 +19,7 @@ def tf_function_wrapper(features, labels):
               'label_length': label_length}
 
     # dummy data for dummy loss function
-    outputs = {'ctc': np.zeros([4])}  # batch size
+    outputs = {'ctc': np.zeros([batch_size])}
 
     return inputs, outputs
 
@@ -29,7 +31,7 @@ def remove_big_sentences(x, y):
 
 def load_dataset(csv_filename):
     librivox_paths_ds = tf.data.experimental.make_csv_dataset(
-        csv_filename, batch_size=16,
+        csv_filename, batch_size=batch_size,
         shuffle=False, label_name="transcript")
 
     librivox_paths_ds = librivox_paths_ds.filter(remove_big_sentences)

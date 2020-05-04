@@ -1,5 +1,7 @@
 import tensorflow as tf
 
+mfcc_features = 26
+
 
 def load_waves(path):
     raw_audio = tf.io.read_file(path)  # load file
@@ -21,9 +23,12 @@ def convert_to_spectrogram(stfts):
     return spectrograms, num_spectrogram_bins
 
 
-def convert_log_mel_spectrograms(spectrograms, sample_rate,
-                                 num_spectrogram_bins, lower_edge_hertz=80.0,
-                                 upper_edge_hertz=7600.0, num_mel_bins=26):
+def convert_log_mel_spectrograms(spectrograms,
+                                 sample_rate,
+                                 num_spectrogram_bins,
+                                 lower_edge_hertz=80.0,
+                                 upper_edge_hertz=7600.0,
+                                 num_mel_bins=mfcc_features):
 
     linear_to_mel_weight_matrix = tf.signal.linear_to_mel_weight_matrix(
         num_mel_bins, num_spectrogram_bins, sample_rate, lower_edge_hertz,

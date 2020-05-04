@@ -1,17 +1,23 @@
-from tensorflow.keras.layers import Input, TimeDistributed, Dense, Dropout
+from tensorflow.keras.layers import TimeDistributed, Dense, Dropout
 from tensorflow.keras.layers import Bidirectional, SimpleRNN, Lambda, Masking
 import tensorflow.keras.backend as K
-from tensorflow.keras.models import Model
+from tensorflow.keras import Model, Input
+import tensorflow as tf
 
 # Architecture from Baidu Deep speech: Scaling up end-to-end speech recognition (https://arxiv.org/pdf/1412.5567.pdf)
 
 
-def brnn_model(units,
-               input_dim=26,
-               output_dim=29,
-               dropout=0.2,
-               numb_of_dense=3,
-               n_layers=1):
+def brnn_model(
+    units,
+    input_dim=26,
+    output_dim=29,
+    dropout=0.2,
+    # numb_of_dense=3,
+    # n_layers=1,
+    numb_of_dense=0,
+    n_layers=0,
+    batch_size=4,
+):
     """
     :param units: Hidden units per layer
     :param input_dim: Size of input dimension (number of features), default=26
@@ -30,7 +36,7 @@ def brnn_model(units,
     """
 
     # Input data type
-    dtype = 'float32'
+    # dtype = 'float32'
     # Kernel and bias initializers for fully connected dense layers
     kernel_init_dense = 'random_normal'
     bias_init_dense = 'random_normal'
@@ -41,7 +47,12 @@ def brnn_model(units,
 
     # ---- Network model ----
     # x_input layer, dim: (batch_size * x_seq_size * features)
-    input_data = Input(name='the_input', shape=(None, input_dim), dtype=dtype)
+    # shape=(None) refers to variable input shape
+    input_data = Input(
+        name='the_input',
+        shape=(None, input_dim),
+        dtype=tf.float32,
+        batch_size=batch_size)
 
     # Masking layer
     x = Masking(mask_value=0., name='masking')(input_data)
@@ -49,47 +60,51 @@ def brnn_model(units,
     # Default 3 fully connected layers DNN ReLu
     # Default dropout rate 20 % at each FC layer
     for i in range(0, numb_of_dense):
-        x = TimeDistributed(Dense(units=units,
-                                  kernel_initializer=kernel_init_dense,
-                                  bias_initializer=bias_init_dense,
-                                  activation=clipped_relu), name='fc_'+str(i+1))(x)
-        x = TimeDistributed(Dropout(dropout), name='dropout_'+str(i+1))(x)
+        x = TimeDistributed(Dense(
+            units=units, kernel_initializer=kernel_init_dense,
+            bias_initializer=bias_init_dense, activation=clipped_relu), name='fc_'+str(i+1))(x)
+        x = TimeDistributed(
+            Dropout(dropout), name='dropout_'+str(i+1))(x)
 
     # Bidirectional RNN (with ReLu)
     for i in range(0, n_layers):
-        x = Bidirectional(SimpleRNN(units, activation='relu',
-                                    kernel_initializer=kernel_init_rnn,
-                                    dropout=0.2,
-                                    bias_initializer=bias_init_rnn,
-                                    return_sequences=True),
-                          merge_mode='concat', name='bi_rnn'+str(i+1))(x)
+        x = Bidirectional(SimpleRNN(
+            units, activation='relu', kernel_initializer=kernel_init_rnn,
+            dropout=0.2, bias_initializer=bias_init_rnn, return_sequences=True),
+            merge_mode='concat', name='bi_rnn'+str(i+1))(x)
 
     # 1 fully connected layer DNN ReLu with default 20% dropout
-    x = TimeDistributed(Dense(units=units,
-                              kernel_initializer=kernel_init_dense,
-                              bias_initializer=bias_init_dense,
-                              activation='relu'), name='fc_4')(x)
-    x = TimeDistributed(Dropout(dropout), name='dropout_4')(x)
+    x = TimeDistributed(Dense(
+        units=units,
+        kernel_initializer=kernel_init_dense,
+        bias_initializer=bias_init_dense, activation='relu'), name='fc_4')(x)
+    x = TimeDistributed(
+        Dropout(dropout), name='dropout_4')(x)
 
     # Output layer with softmax
-    y_pred = TimeDistributed(Dense(units=output_dim,
-                                   kernel_initializer=kernel_init_dense,
-                                   bias_initializer=bias_init_dense,
-                                   activation='softmax'), name='softmax')(x)
+    y_pred = TimeDistributed(Dense(
+        units=output_dim, kernel_initializer=kernel_init_dense,
+        bias_initializer=bias_init_dense, activation='softmax'),
+        name='softmax')(x)
 
     # ---- CTC ----
     # y_input layers (transcription data) for CTC loss
     # transcription data (batch_size * y_seq_size)
-    labels = Input(name='the_labels', shape=[None], dtype=dtype)
+    labels = Input(
+        name='the_labels', shape=[None],
+        dtype=tf.int32, batch_size=batch_size)
     # unpadded len of all x_sequences in batch
-    input_length = Input(name='input_length', shape=[1], dtype=dtype)
+    input_length = Input(
+        name='input_length', shape=[1],
+        dtype=tf.int32, batch_size=batch_size)
     # unpadded len of all y_sequences in batch
-    label_length = Input(name='label_length', shape=[1], dtype=dtype)
+    label_length = Input(
+        name='label_length', shape=[1],
+        dtype=tf.int32, batch_size=batch_size)
 
     # Lambda layer with ctc_loss function due to Keras not supporting CTC layers
-    loss_out = Lambda(function=ctc_lambda_func,
-                      name='ctc',
-                      output_shape=(1,))(
+    loss_out = Lambda(
+        function=ctc_lambda_func, name='ctc', output_shape=(1,))(
         [y_pred, labels, input_length, label_length])
 
     network_model = Model(
