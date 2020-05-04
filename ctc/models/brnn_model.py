@@ -12,11 +12,9 @@ def brnn_model(
     input_dim=26,
     output_dim=29,
     dropout=0.2,
-    # numb_of_dense=3,
-    # n_layers=1,
-    numb_of_dense=0,
-    n_layers=0,
-    batch_size=4,
+    numb_of_dense=1,
+    n_layers=1,
+    batch_size=16,
 ):
     """
     :param units: Hidden units per layer
@@ -121,7 +119,7 @@ def ctc_lambda_func(args):
     # the 2 is critical here since the first couple outputs of the RNN
     # tend to be garbage:
     # print "y_pred_shape: ", y_pred.shape
-    y_pred = y_pred[:, 2:, :]
+    # y_pred = y_pred[:, 2:, :]
     # print "y_pred_shape: ", y_pred.shape
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 

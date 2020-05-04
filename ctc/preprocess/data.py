@@ -3,7 +3,7 @@ import numpy as np
 from preprocess.features import process as process_features
 from preprocess.labels import process as process_labels
 
-batch_size = 4
+batch_size = 16
 
 
 def tf_function_wrapper(features, labels):
@@ -36,5 +36,7 @@ def load_dataset(csv_filename):
 
     librivox_paths_ds = librivox_paths_ds.filter(remove_big_sentences)
     librivox_ds = librivox_paths_ds.map(
-        tf_function_wrapper, num_parallel_calls=1)
+        tf_function_wrapper, num_parallel_calls=6)
+    librivox_ds = librivox_ds.prefetch(buffer_size=1)
+
     return librivox_ds
