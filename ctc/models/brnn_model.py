@@ -14,7 +14,7 @@ def brnn_model(
     dropout=0.2,
     numb_of_dense=1,
     n_layers=1,
-    batch_size=16,
+    batch_size=4,
 ):
     """
     :param units: Hidden units per layer
