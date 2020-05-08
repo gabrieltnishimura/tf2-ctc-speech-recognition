@@ -3,7 +3,7 @@ import numpy as np
 from preprocess.features import process as process_features
 from preprocess.labels import process as process_labels
 
-batch_size = 16
+batch_size = 4
 
 
 def tf_function_wrapper(features, labels):

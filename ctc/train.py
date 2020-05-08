@@ -3,20 +3,12 @@ from preprocess.data import load_dataset
 from models import brnn
 from training.LossCallback import LossCallback
 from datetime import datetime
+from config import ApplicationArguments
 
-training_ds = load_dataset("librivox-train-clean-100-wav.csv")
-validation_ds = load_dataset("librivox-dev-clean-wav.csv")
-test_ds = load_dataset("librivox-test-clean-wav.csv")
-
-# for features, labels in training_ds.take(1):
-#     tf.print(tf.rank(features['the_input']))
-#     tf.print(tf.rank(features['the_labels']))
-#     tf.print(tf.rank(features['input_length']))
-#     tf.print(tf.rank(features['label_length']))
-#     tf.print(features['the_input'].get_shape())
-#     tf.print(features['the_labels'].get_shape())
-#     tf.print(features['input_length'].get_shape())
-#     tf.print(features['label_length'].get_shape())
+args = ApplicationArguments()
+training_ds = load_dataset(args.trainDataset)
+validation_ds = load_dataset(args.validationDataset)
+test_ds = load_dataset(args.testDataset)
 
 print("\n\nModel and training parameters: ")
 print("Starting time: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
