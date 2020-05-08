@@ -13,7 +13,6 @@ test_ds = load_dataset(args.testDataset)
 print("\n\nModel and training parameters: ")
 print("Starting time: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-tf.keras.utils.plot_model(brnn, 'my_first_model.png')
 brnn.summary()
 
 input_data = brnn.get_layer('the_input').input
