@@ -1,5 +1,0 @@
-{
-  "trainingDatasetPath": "data/local/librivox-train-clean-1-wav.csv",
-  "testDatasetPath": "data/local/librivox-test-clean-wav.csv",
-  "validationDatasetPath": "data/local/librivox-dev-clean-wav.csv"
-}
