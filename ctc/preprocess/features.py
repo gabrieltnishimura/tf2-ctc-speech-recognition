@@ -1,18 +1,22 @@
 import tensorflow as tf
-
+import tensorflow_io as tfio
 mfcc_features = 26
 
 
 def load_waves(path):
     raw_audio = tf.io.read_file(path)  # load file
-    waveform, sample_rate = tf.audio.decode_wav(
-        raw_audio)  # load waveforms in memory
-    return waveform, sample_rate
+    tf.print(raw_audio)
+    waveform = tf.audio.decode_wav(raw_audio)
+    # waveform = tfio.audio.decode_flac(raw_audio, dtype=tf.int16)
+    tf.print(waveform)
+    # waveform, sample_rate = tf.audio.decode_wav(
+    # raw_audio)  # load waveforms in memory
+    return waveform, 16000
 
 
 def convert_to_stft(waveform, frame_length=1024, frame_step=256,
                     fft_length=1024):
-    transwav = tf.transpose(waveform)  # shanenigans to stft
+    transwav = tf.transpose(waveform)  # shanenpiigans to stft
     stfts = tf.signal.stft(transwav, frame_length, frame_step, fft_length)
     return stfts
 
