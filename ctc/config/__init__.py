@@ -12,9 +12,9 @@ class ApplicationArguments():
     def _parseArgumentsFromCommandLine(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('-tr', '--trainDataset', metavar='trainDataset', dest='trainDataset',
-                            help='Train dataset csv path', default='data/local/librivox-train-clean-1-wav.csv')
+                            help='Train dataset csv path', default='NOT SET TRAIN')
         parser.add_argument('-v', '--validationDataset', metavar='validationDataset', dest='validationDataset',
-                            help='Validation dataset csv path', default='data/local/librivox-dev-clean-wav.csv')
+                            help='Validation dataset csv path', default='NOT SET VAL')
         parser.add_argument('-te', '--testDataset', metavar='testDataset', dest='testDataset',
-                            help='Test dataset csv path', default='data/local/librivox-test-clean-wav.csv')
+                            help='Test dataset csv path', default='NOT SET TEST')
         return parser.parse_args()
